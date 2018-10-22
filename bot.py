@@ -34,14 +34,21 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(ctx,err):
-	await ctx.send(err)
+    await ctx.send(err)
 
 @bot.command()
 async def info(ctx):
     """Information about the bot.
 
-
-
+    Prints some info about the bot, including its creator, repository, and license.
+    """
+    text = "\n".join((
+        "**Question mark stats bot**",
+        "Created by ed588",
+        "The source code for this bot is available at https://github.com/ed588/question-mark-stats.",
+        "The source code is AGPL3 licensed. Contributions are welcome."
+    ))
+    await ctx.send(text)
 
 @commands.guild_only()
 @commands.cooldown(1, 60)
@@ -53,40 +60,39 @@ async def go(ctx):
     This does quite a lot of requesting, so it is currently globally cooldown'd to
     only once every 60 seconds.
     """
-
-	ch = bot.get_channel(channel_ids['monitor'])
-	ch_rep = bot.get_channel(channel_ids['report'])
-	start = await ch.get_message(initial_message)
-	count = 0
-	by_users = {}
-	async for msg in ch.history(limit=None, after=start):
-		if msg.content != "?" and msg.type == discord.MessageType.default:
-			await report_bad(msg, ch_rep)
-		else:
-			count += 1
-			if msg.author.name not in by_users:
-				by_users[msg.author.name] = 1
-			else:
-				by_users[msg.author.name] += 1
-	await ch_rep.send("I found {} messages that are question marks...".format(count))
-	await ch_rep.send("Pie chart coming up...")
-	with ch_rep.typing():
-		by_users = {k:v for k,v in by_users.items() if v > (count/100)}
-		labels, values = zip(*sorted(by_users.items(), key=lambda kv: kv[1], reverse=True))
-		nowtotal = sum(values)
-		labels=list(labels)
-		values=list(values)
-		labels.append("Other")
-		values.append(count-nowtotal)
-		fig, ax = plt.subplots()
-		ax.pie(values, labels=labels, autopct=lambda p: '{:.0f}'.format(p * sum(values) / 70), startangle=90)
-		ax.axis("equal")
-		buff = BytesIO()
-		fig.savefig(buff, format="png")
-		buff.seek(0)
-		f = discord.File(buff, "pie.png")
-		await ch_rep.send(file=f)
-		buff.close()
+    ch = bot.get_channel(channel_ids['monitor'])
+    ch_rep = bot.get_channel(channel_ids['report'])
+    start = await ch.get_message(initial_message)
+    count = 0
+    by_users = {}
+    async for msg in ch.history(limit=None, after=start):
+        if msg.content != "?" and msg.type == discord.MessageType.default:
+            await report_bad(msg, ch_rep)
+        else:
+            count += 1
+            if msg.author.name not in by_users:
+                by_users[msg.author.name] = 1
+            else:
+                by_users[msg.author.name] += 1
+    await ch_rep.send("I found {} messages that are question marks...".format(count))
+    await ch_rep.send("Pie chart coming up...")
+    with ch_rep.typing():
+        by_users = {k:v for k,v in by_users.items() if v > (count/100)}
+        labels, values = zip(*sorted(by_users.items(), key=lambda kv: kv[1], reverse=True))
+        nowtotal = sum(values)
+        labels=list(labels)
+        values=list(values)
+        labels.append("Other")
+        values.append(count-nowtotal)
+        fig, ax = plt.subplots()
+        ax.pie(values, labels=labels, autopct=lambda p: '{:.0f}'.format(p * sum(values) / 70), startangle=90)
+        ax.axis("equal")
+        buff = BytesIO()
+        fig.savefig(buff, format="png")
+        buff.seek(0)
+        f = discord.File(buff, "pie.png")
+        await ch_rep.send(file=f)
+        buff.close()
 
 async def report_bad(msg, ch_rep):
     lstr = "I found a message saying [{0.content}] (by {0.author}, on {0.created_at})".format(msg)
