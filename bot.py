@@ -26,6 +26,13 @@ async def on_command_error(ctx,err):
 @commands.cooldown(1, 60)
 @bot.command()
 async def go(ctx):
+    """Go!
+
+    Grabs all the messages, does the maths, makes a pretty(ish) chart, etc etc.
+    This does quite a lot of requesting, so it is currently globally cooldown'd to
+    only once every 60 seconds.
+    """
+
 	ch = bot.get_channel(channel_ids['monitor'])
 	ch_rep = bot.get_channel(channel_ids['report'])
 	start = await ch.get_message(initial_message)
