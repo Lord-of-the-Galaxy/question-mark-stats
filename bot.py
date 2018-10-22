@@ -1,3 +1,17 @@
+"""Question mark stats bot
+Copyright (C) 2018 ed588
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+"""
+
 import discord
 from discord.ext import commands
 import logging
@@ -21,6 +35,13 @@ async def on_ready():
 @bot.event
 async def on_command_error(ctx,err):
 	await ctx.send(err)
+
+@bot.command()
+async def info(ctx):
+    """Information about the bot.
+
+
+
 
 @commands.guild_only()
 @commands.cooldown(1, 60)
