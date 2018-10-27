@@ -15,6 +15,9 @@ GNU Affero General Public License for more details.
 import discord
 from discord.ext import commands
 import logging
+import matplotlib
+# force matplotlib to not use any kind of Xwindows backend - allows use on headless systems
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from io import BytesIO
 from conf import channel_ids, initial_message
