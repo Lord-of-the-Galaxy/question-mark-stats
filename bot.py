@@ -65,21 +65,21 @@ async def go(ctx):
     """
     ch = bot.get_channel(channel_ids['monitor'])
     ch_rep = bot.get_channel(channel_ids['report'])
-    start = await ch.get_message(initial_message)
-    count = 0
-    by_users = {}
-    async for msg in ch.history(limit=None, after=start):
-        if msg.content != "?" and msg.type == discord.MessageType.default:
-            await report_bad(msg, ch_rep)
-        else:
-            count += 1
-            if msg.author.name not in by_users:
-                by_users[msg.author.name] = 1
+    async with ch.typing():
+        start = await ch.get_message(initial_message)
+        count = 0
+        by_users = {}
+        async for msg in ch.history(limit=None, after=start):
+            if msg.content != "?" and msg.type == discord.MessageType.default:
+                await report_bad(msg, ch_rep)
             else:
-                by_users[msg.author.name] += 1
-    await ch_rep.send("I found {} messages that are question marks...".format(count))
-    await ch_rep.send("Pie chart coming up...")
-    with ch_rep.typing():
+                count += 1
+                if msg.author.name not in by_users:
+                    by_users[msg.author.name] = 1
+                else:
+                    by_users[msg.author.name] += 1
+        await ch_rep.send("I found {} messages that are question marks...".format(count))
+        await ch_rep.send("Pie chart coming up...")
         by_users = {k:v for k,v in by_users.items() if v > (count/100)}
         labels, values = zip(*sorted(by_users.items(), key=lambda kv: kv[1], reverse=True))
         nowtotal = sum(values)
