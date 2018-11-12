@@ -162,6 +162,6 @@ async def history(ctx, *, opt="14"):
         ax.plot_date(dates_only, counts, 'b-')
         await send_figure(fig, ch_rep)
 
-
-token = open("token", "r").read().rstrip()
-bot.run(token)
+if __name__ == "__main__":
+    token = open("token", "r").read().rstrip()
+    bot.run(token)
